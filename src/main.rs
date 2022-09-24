@@ -10,12 +10,9 @@ enum GameState{
     End
 }
 
-#[derive(Copy, Clone)]
-enum Owner {
-    White,
-    Black,
-    None
-}
+const NOPLAYER: u8 = -1 
+const WHITE: u8 = 0
+const BLACK: u8 = 1
 
 #[derive(Copy, Clone)]
 enum Type {
@@ -31,46 +28,45 @@ enum Type {
 #[derive(Copy, Clone)]
 struct Piece{
     ptype: Type,
-    owner: Owner
+    owner: u8
 }
 
 impl Default for Piece{
     fn default() -> Piece {
         Piece {
             ptype: Type::None,
-            owner: Owner::None
+            owner: NOPLAYER
         }
     }
 }
 
 fn setup_board(board: &mut Vec<Vec<Piece>>){
-    board[0][0] = Piece {ptype: Type::Rook, owner: Owner::White};
-    board[0][1] = Piece {ptype: Type::Knight, owner: Owner::White};
-    board[0][2] = Piece {ptype: Type::Bishop, owner: Owner::White};
-    board[0][3] = Piece {ptype: Type::Queen, owner: Owner::White};
-    board[0][4] = Piece {ptype: Type::King, owner: Owner::White};
-    board[0][5] = Piece {ptype: Type::Bishop, owner: Owner::White};
-    board[0][6] = Piece {ptype: Type::Knight, owner: Owner::White};
-    board[0][7] = Piece {ptype: Type::Rook, owner: Owner::White};
-    board[1] = vec![Piece {ptype: Type::Pawn, owner: Owner::White}; 8];
+    board[0][0] = Piece {ptype: Type::Rook, owner: WHITE};
+    board[0][1] = Piece {ptype: Type::Knight, owner: WHITE};
+    board[0][2] = Piece {ptype: Type::Bishop, owner: WHITE};
+    board[0][3] = Piece {ptype: Type::Queen, owner: WHITE};
+    board[0][4] = Piece {ptype: Type::King, owner: WHITE};
+    board[0][5] = Piece {ptype: Type::Bishop, owner: WHITE};
+    board[0][6] = Piece {ptype: Type::Knight, owner: WHITE};
+    board[0][7] = Piece {ptype: Type::Rook, owner: WHITE};
+    board[1] = vec![Piece {ptype: Type::Pawn, owner: WHITE}; 8];
 
-    board[7][0] = Piece {ptype: Type::Rook, owner: Owner::Black};
-    board[7][1] = Piece {ptype: Type::Knight, owner: Owner::Black};
-    board[7][2] = Piece {ptype: Type::Bishop, owner: Owner::Black};
-    board[7][3] = Piece {ptype: Type::Queen, owner: Owner::Black};
-    board[7][4] = Piece {ptype: Type::King, owner: Owner::Black};
-    board[7][5] = Piece {ptype: Type::Bishop, owner: Owner::Black};
-    board[7][6] = Piece {ptype: Type::Knight, owner: Owner::Black};
-    board[7][7] = Piece {ptype: Type::Rook, owner: Owner::Black};
-    board[6] = vec![Piece {ptype: Type::Pawn, owner: Owner::Black}; 8];
+    board[7][0] = Piece {ptype: Type::Rook, owner: BLACK};
+    board[7][1] = Piece {ptype: Type::Knight, owner: BLACK};
+    board[7][2] = Piece {ptype: Type::Bishop, owner: BLACK};
+    board[7][3] = Piece {ptype: Type::Queen, owner: BLACK};
+    board[7][4] = Piece {ptype: Type::King, owner: BLACK};
+    board[7][5] = Piece {ptype: Type::Bishop, owner: BLACK};
+    board[7][6] = Piece {ptype: Type::Knight, owner: BLACK};
+    board[7][7] = Piece {ptype: Type::Rook, owner: BLACK};
+    board[6] = vec![Piece {ptype: Type::Pawn, owner: BLACK}; 8];
 }
 
 fn draw_line(){
     println!("├───┼───┼───┼───┼───┼───┼───┼───┤");
 }
 fn piece_to_symbol(piece: Piece) -> char{
-    match piece.owner {
-        Owner::White =>{
+    if piece.owner == WHITE {
             match piece.ptype{
                 Type::King=>'♚',
                 Type::Queen=>'♛',
@@ -80,8 +76,7 @@ fn piece_to_symbol(piece: Piece) -> char{
                 Type::Pawn=>'♟',
                 _ => ' '
             }
-        },
-        Owner::Black => {
+    } else if piece.owner == BLACK {
             match piece.ptype{
                 Type::King=>'♔',
                 Type::Queen=>'♕',
@@ -91,7 +86,7 @@ fn piece_to_symbol(piece: Piece) -> char{
                 Type::Pawn=>'♙',
                 _ => ' '
             }
-        },
+    } else{
         Owner::None => ' '
     }
 }
@@ -113,9 +108,25 @@ fn draw_board(board: &Vec<Vec<Piece>>){
     }
     println!("└───┴───┴───┴───┴───┴───┴───┴───┘");
 }
+fn get_cur_turn()-> u8 {
+    match state {
+        GameState::WhiteTurn => WHITE,
+        GameState::BlackTurn => BLACK,
+        _ => NOPLAYER
+    }
+}
 
-fn check_move(board: &Vec<Vec<Piece>>,tgt: (u8,u8), piece: Type) -> (u8,u8){
+fn check_move(board: &Vec<Vec<Piece>>,tgt: (u8,u8), piecetype: Type) -> (u8,u8){
+    let mut pos_moves = vec::new();
     match piece{
+        Type::Pawn => {
+            //Standard foward move
+            if let Type::Pawn = board[tgt.0][tgt.1 -1] {
+                if board[tgt.0][tgt.1 -1].owner == player {
+                    pos_moves.push((tgt.0,tgt.1 -1));
+                }
+            }
+        }
         _ =>
     }
 
@@ -123,6 +134,7 @@ fn check_move(board: &Vec<Vec<Piece>>,tgt: (u8,u8), piece: Type) -> (u8,u8){
 }
 
 fn take_turn(board: &mut Vec<Vec<Piece>>){
+    let player : u8 = get_cur_turn();
     let command : String = read!();
     println!("{0}",command);
 }
